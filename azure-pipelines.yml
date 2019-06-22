@@ -1,3 +1,6 @@
+environment:
+    LLVM_VERSION: 5.0.0
+
 strategy:
   matrix:
     windows-stable:
@@ -24,6 +27,15 @@ pool:
 steps:
   - checkout: self
     submodules: true
+  - script: |
+      curl -sSf -o llvm-installer.exe http://releases.llvm.org/%LLVM_VERSION%/LLVM-%LLVM_VERSION%-win64.exe
+    condition: eq( variables['Agent.OS'], 'Windows_NT' )
+  - task: ExtractFiles@1
+    archiveFilePatterns: llvm-installer.exe
+    destinationFolder: %USERPROFILE%/llvm-binary
+  - script: |
+      echo "##vso[task.setvariable variable=PATH;]%PATH%;%USERPROFILE%\llvm-binary\bin"
+    condition: eq( variables['Agent.OS'], 'Windows_NT' )
   - script: |
       curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain $RUSTUP_TOOLCHAIN
       echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
