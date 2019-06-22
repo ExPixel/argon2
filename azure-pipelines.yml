@@ -34,7 +34,7 @@ steps:
     condition: eq( variables['Agent.OS'], 'Windows_NT' )
   - task: ExtractFiles@1
     archiveFilePatterns: llvm-installer.exe
-    destinationFolder: %USERPROFILE%/llvm-binary
+    destinationFolder: "%USERPROFILE%/llvm-binary"
   - script: |
       echo "##vso[task.setvariable variable=PATH;]%PATH%;%USERPROFILE%\llvm-binary\bin"
     condition: eq( variables['Agent.OS'], 'Windows_NT' )
