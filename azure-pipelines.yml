@@ -30,15 +30,11 @@ steps:
   - checkout: self
     submodules: true
   - script: |
-      curl -sSf -o llvm-installer.exe http://releases.llvm.org/%LLVM_VERSION%/LLVM-%LLVM_VERSION%-win64.exe
-    condition: eq( variables['Agent.OS'], 'Windows_NT' )
-  - task: ExtractFiles@1
-    inputs:
-      archiveFilePatterns: llvm-installer.exe
-      destinationFolder: "%USERPROFILE%/llvm-binary"
-  - script: |
-      echo "##vso[task.setvariable variable=PATH;]%PATH%;%USERPROFILE%\llvm-binary\bin"
-    condition: eq( variables['Agent.OS'], 'Windows_NT' )
+      powershell -Command "$ProgressPreference = 'SilentlyContinue'; iwr -outf %TEMP%\LLVM-%LLVM_VERSION%-win64.exe http://releases.llvm.org/%LLVM_VERSION%/LLVM-%LLVM_VERSION%-win64.exe"
+      set CLANG_DIR=%CD%\citools\clang-rust
+      %TEMP%\LLVM-7.0.0-win64.exe /S /NCRC /D=%CLANG_DIR%
+      echo "##vso[task.setvariable variable=PATH;]%PATH%;%CLANG_DIR%\bin"
+    displayName: Install Clang (Windows)
   - script: |
       curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain $RUSTUP_TOOLCHAIN
       echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
@@ -51,6 +47,7 @@ steps:
     displayName: Windows install rust
     condition: eq( variables['Agent.OS'], 'Windows_NT' )
   - script: cargo build --all
-    displayName: Cargo build
+    displayName: Cargo Build
   - script: cargo test --all
-    displayName: Cargo test
+    displayName: Cargo Test
+  - script: cargo test -- --ignored
