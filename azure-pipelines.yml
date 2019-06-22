@@ -33,8 +33,9 @@ steps:
       curl -sSf -o llvm-installer.exe http://releases.llvm.org/%LLVM_VERSION%/LLVM-%LLVM_VERSION%-win64.exe
     condition: eq( variables['Agent.OS'], 'Windows_NT' )
   - task: ExtractFiles@1
-    archiveFilePatterns: llvm-installer.exe
-    destinationFolder: "%USERPROFILE%/llvm-binary"
+    inputs:
+      archiveFilePatterns: llvm-installer.exe
+      destinationFolder: "%USERPROFILE%/llvm-binary"
   - script: |
       echo "##vso[task.setvariable variable=PATH;]%PATH%;%USERPROFILE%\llvm-binary\bin"
     condition: eq( variables['Agent.OS'], 'Windows_NT' )
