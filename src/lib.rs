@@ -670,15 +670,6 @@ mod test {
                  "79a103b90fe8aef8570cb31fc8b22259778916f8336b7bdac3892569d4f1c497",
                  "$argon2i$m=65536,t=2,p=1$ZGlmZnNhbHQ$eaEDuQ/orvhXDLMfyLIiWXeJFvgza3vaw4kladTxxJc",
                  Variant::I);
-
-        check_error_code!(DecodingFail, verify(&c_str_cow(b"$argon2i$m=65536,t=2,p=1c29tZXNhbHQ$9sTbSlTio3Biev89thdrlKKiCaYsjjYVJxGAL3swxpQ"),
-               Some(b"password"), Variant::I));
-        check_error_code!(DecodingFail, verify(&c_str_cow(b"$argon2i$m=65536,t=2,p=1$c29tZXNhbHQ9sTbSlTio3Biev89thdrlKKiCaYsjjYVJxGAL3swxpQ"),
-               Some(b"password"), Variant::I));
-        check_error_code!(SaltTooShort, verify(&c_str_cow(b"$argon2i$m=65536,t=2,p=1$$9sTbSlTio3Biev89thdrlKKiCaYsjjYVJxGAL3swxpQ"),
-               Some(b"password"), Variant::I));
-        check_error_code!(VerifyMismatch, verify(&c_str_cow(b"$argon2i$m=65536,t=2,p=1$c29tZXNhbHQ$b2G3seW+uPzerwQQC+/E1K50CLLO7YXy0JRcaTuswRo"),
-               Some(b"password"), Variant::I));
     }
 
     #[test]
@@ -688,5 +679,153 @@ mod test {
                 "9690ec55d28d3ed32562f2e73ea62b02b018757643a2ae6e79528459de8106e9",
                 "$argon2i$m=1048576,t=2,p=1$c29tZXNhbHQ$lpDsVdKNPtMlYvLnPqYrArAYdXZDoq5ueVKEWd6BBuk",
                 Variant::I);
+    }
+
+    #[test]
+    fn test_argon2i_0x10_errors() {
+        // Handle an invalid encoding correctly (it is missing a $)
+        check_error_code!(DecodingFail, verify(&c_str_cow(b"$argon2i$m=65536,t=2,p=1c29tZXNhbHQ$9sTbSlTio3Biev89thdrlKKiCaYsjjYVJxGAL3swxpQ"),
+               Some(b"password"), Variant::I));
+
+        // Handle an invalid encoding correctly (it is missing a $)
+        check_error_code!(DecodingFail, verify(&c_str_cow(b"$argon2i$m=65536,t=2,p=1$c29tZXNhbHQ9sTbSlTio3Biev89thdrlKKiCaYsjjYVJxGAL3swxpQ"),
+               Some(b"password"), Variant::I));
+
+        // Handle an invalid encoding correctly (salt is too short)
+        check_error_code!(SaltTooShort, verify(&c_str_cow(b"$argon2i$m=65536,t=2,p=1$$9sTbSlTio3Biev89thdrlKKiCaYsjjYVJxGAL3swxpQ"),
+               Some(b"password"), Variant::I));
+
+        // Handle an invalid encoding correctly (the encoded password is "passwore")
+        check_error_code!(VerifyMismatch, verify(&c_str_cow(b"$argon2i$m=65536,t=2,p=1$c29tZXNhbHQ$b2G3seW+uPzerwQQC+/E1K50CLLO7YXy0JRcaTuswRo"),
+               Some(b"password"), Variant::I));
+    }
+
+    #[test]
+    fn test_argon2i_0x13() {
+        println!("Test Argon2i version number: 0x{:02X}", (Version::Version13).to_int());
+
+        hashtest(Version::Version13, 2, 16, 1, "password", "somesalt",
+                 "c1628832147d9720c5bd1cfd61367078729f6dfb6f8fea9ff98158e0d7816ed0",
+                 "$argon2i$v=19$m=65536,t=2,p=1$c29tZXNhbHQ$wWKIMhR9lyDFvRz9YTZweHKfbftvj+qf+YFY4NeBbtA",
+                 Variant::I);
+        hashtest(Version::Version13, 2, 18, 1, "password", "somesalt",
+                 "296dbae80b807cdceaad44ae741b506f14db0959267b183b118f9b24229bc7cb",
+                 "$argon2i$v=19$m=262144,t=2,p=1$c29tZXNhbHQ$KW266AuAfNzqrUSudBtQbxTbCVkmexg7EY+bJCKbx8s",
+                 Variant::I);
+        hashtest(Version::Version13, 2, 8, 1, "password", "somesalt",
+                 "89e9029f4637b295beb027056a7336c414fadd43f6b208645281cb214a56452f",
+                 "$argon2i$v=19$m=256,t=2,p=1$c29tZXNhbHQ$iekCn0Y3spW+sCcFanM2xBT63UP2sghkUoHLIUpWRS8",
+                 Variant::I);
+        hashtest(Version::Version13, 2, 8, 2, "password", "somesalt",
+                 "4ff5ce2769a1d7f4c8a491df09d41a9fbe90e5eb02155a13e4c01e20cd4eab61",
+                 "$argon2i$v=19$m=256,t=2,p=2$c29tZXNhbHQ$T/XOJ2mh1/TIpJHfCdQan76Q5esCFVoT5MAeIM1Oq2E",
+                 Variant::I);
+        hashtest(Version::Version13, 1, 16, 1, "password", "somesalt",
+                 "d168075c4d985e13ebeae560cf8b94c3b5d8a16c51916b6f4ac2da3ac11bbecf",
+                 "$argon2i$v=19$m=65536,t=1,p=1$c29tZXNhbHQ$0WgHXE2YXhPr6uVgz4uUw7XYoWxRkWtvSsLaOsEbvs8",
+                 Variant::I);
+        hashtest(Version::Version13, 4, 16, 1, "password", "somesalt",
+                 "aaa953d58af3706ce3df1aefd4a64a84e31d7f54175231f1285259f88174ce5b",
+                 "$argon2i$v=19$m=65536,t=4,p=1$c29tZXNhbHQ$qqlT1YrzcGzj3xrv1KZKhOMdf1QXUjHxKFJZ+IF0zls",
+                 Variant::I);
+        hashtest(Version::Version13, 2, 16, 1, "differentpassword", "somesalt",
+                 "14ae8da01afea8700c2358dcef7c5358d9021282bd88663a4562f59fb74d22ee",
+                 "$argon2i$v=19$m=65536,t=2,p=1$c29tZXNhbHQ$FK6NoBr+qHAMI1jc73xTWNkCEoK9iGY6RWL1n7dNIu4",
+                 Variant::I);
+        hashtest(Version::Version13, 2, 16, 1, "password", "diffsalt",
+                 "b0357cccfbef91f3860b0dba447b2348cbefecadaf990abfe9cc40726c521271",
+                 "$argon2i$v=19$m=65536,t=2,p=1$ZGlmZnNhbHQ$sDV8zPvvkfOGCw26RHsjSMvv7K2vmQq/6cxAcmxSEnE",
+                 Variant::I);
+    }
+
+    #[test]
+    #[ignore]
+    pub fn test_argon2i_0x13_large_ram() {
+        hashtest(Version::Version13, 2, 20, 1, "password", "somesalt",
+                 "d1587aca0922c3b5d6a83edab31bee3c4ebaef342ed6127a55d19b2351ad1f41",
+                 "$argon2i$v=19$m=1048576,t=2,p=1$c29tZXNhbHQ$0Vh6ygkiw7XWqD7asxvuPE667zQu1hJ6VdGbI1GtH0E",
+                 Variant::I);
+    }
+
+    #[test]
+    fn test_argon2i_0x13_errors() {
+        // Handle an invalid encoding correctly (it is missing a $)
+        check_error_code!(DecodingFail, verify(
+                &c_str_cow(b"$argon2i$v=19$m=65536,t=2,p=1$c29tZXNhbHQwWKIMhR9lyDFvRz9YTZweHKfbftvj+qf+YFY4NeBbtA"),
+                Some(b"password"), Variant::I));
+
+        // Handle an invalid encoding correctly (it is missing a $)
+        check_error_code!(DecodingFail, verify(
+                &c_str_cow(b"$argon2i$v=19$m=65536,t=2,p=1$c29tZXNhbHQwWKIMhR9lyDFvRz9YTZweHKfbftvj+qf+YFY4NeBbtA"),
+                Some(b"password"), Variant::I));
+
+        // Handle an invalid encoding correctly (salt is too short)
+        check_error_code!(SaltTooShort, verify(
+                &c_str_cow(b"$argon2i$v=19$m=65536,t=2,p=1$$9sTbSlTio3Biev89thdrlKKiCaYsjjYVJxGAL3swxpQ"),
+                Some(b"password"), Variant::I));
+
+        // Handle an invalid encoding correctly (the encoded password is "passwore")
+        check_error_code!(VerifyMismatch, verify(
+                &c_str_cow(b"$argon2i$v=19$m=65536,t=2,p=1$c29tZXNhbHQ$8iIuixkI73Js3G1uMbezQXD0b8LG4SXGsOwoQkdAQIM"),
+                Some(b"password"), Variant::I));
+    }
+
+    #[test]
+    fn test_argon2id_0x13() {
+        println!("Test Argon2id version number: 0x{:02X}", (Version::Version13).to_int());
+
+        hashtest(Version::Version13, 2, 16, 1, "password", "somesalt",
+                 "09316115d5cf24ed5a15a31a3ba326e5cf32edc24702987c02b6566f61913cf7",
+                 "$argon2id$v=19$m=65536,t=2,p=1$c29tZXNhbHQ$CTFhFdXPJO1aFaMaO6Mm5c8y7cJHAph8ArZWb2GRPPc", Variant::ID);
+        hashtest(Version::Version13, 2, 18, 1, "password", "somesalt",
+                 "78fe1ec91fb3aa5657d72e710854e4c3d9b9198c742f9616c2f085bed95b2e8c",
+                 "$argon2id$v=19$m=262144,t=2,p=1$c29tZXNhbHQ$eP4eyR+zqlZX1y5xCFTkw9m5GYx0L5YWwvCFvtlbLow", Variant::ID);
+        hashtest(Version::Version13, 2, 8, 1, "password", "somesalt",
+                 "9dfeb910e80bad0311fee20f9c0e2b12c17987b4cac90c2ef54d5b3021c68bfe",
+                 "$argon2id$v=19$m=256,t=2,p=1$c29tZXNhbHQ$nf65EOgLrQMR/uIPnA4rEsF5h7TKyQwu9U1bMCHGi/4", Variant::ID);
+        hashtest(Version::Version13, 2, 8, 2, "password", "somesalt",
+                 "6d093c501fd5999645e0ea3bf620d7b8be7fd2db59c20d9fff9539da2bf57037",
+                 "$argon2id$v=19$m=256,t=2,p=2$c29tZXNhbHQ$bQk8UB/VmZZF4Oo79iDXuL5/0ttZwg2f/5U52iv1cDc", Variant::ID);
+        hashtest(Version::Version13, 1, 16, 1, "password", "somesalt",
+                 "f6a5adc1ba723dddef9b5ac1d464e180fcd9dffc9d1cbf76cca2fed795d9ca98",
+                 "$argon2id$v=19$m=65536,t=1,p=1$c29tZXNhbHQ$9qWtwbpyPd3vm1rB1GThgPzZ3/ydHL92zKL+15XZypg", Variant::ID);
+        hashtest(Version::Version13, 4, 16, 1, "password", "somesalt",
+                 "9025d48e68ef7395cca9079da4c4ec3affb3c8911fe4f86d1a2520856f63172c",
+                 "$argon2id$v=19$m=65536,t=4,p=1$c29tZXNhbHQ$kCXUjmjvc5XMqQedpMTsOv+zyJEf5PhtGiUghW9jFyw", Variant::ID);
+        hashtest(Version::Version13, 2, 16, 1, "differentpassword", "somesalt",
+                 "0b84d652cf6b0c4beaef0dfe278ba6a80df6696281d7e0d2891b817d8c458fde",
+                 "$argon2id$v=19$m=65536,t=2,p=1$c29tZXNhbHQ$C4TWUs9rDEvq7w3+J4umqA32aWKB1+DSiRuBfYxFj94", Variant::ID);
+        hashtest(Version::Version13, 2, 16, 1, "password", "diffsalt",
+                 "bdf32b05ccc42eb15d58fd19b1f856b113da1e9a5874fdcc544308565aa8141c",
+                 "$argon2id$v=19$m=65536,t=2,p=1$ZGlmZnNhbHQ$vfMrBczELrFdWP0ZsfhWsRPaHppYdP3MVEMIVlqoFBw", Variant::ID);
+    }
+
+    #[test]
+    fn test_common_error_states() {
+        const OUTLEN: usize = 32;
+        let mut out = [0u8; OUTLEN];
+
+        check_error_code!(MemoryTooLittle, hash(2, 1, 1,
+                                                Some(b"password"), Some(b"diffsalt"),
+                                                Some(&mut out), None,
+                                                Variant::ID, Version::Version13));
+        check_error_code!(SaltTooShort, hash(2, 1 << 12, 1,
+                                                Some(b"password"), Some(b"s"),
+                                                Some(&mut out), None,
+                                                Variant::ID, Version::Version13));
+
+        // @NOTE This test is missing because it's not possible to pass a mismatched length/pointer
+        // pair to this function :)
+        //
+        //     ret = argon2_hash(2, 1 << 12, 1, NULL, strlen("password"),
+        //                "diffsalt", strlen("diffsalt"),
+        //                out, OUT_LEN, NULL, 0, Argon2_id, version);
+        //
+        // It would look something like this:
+        //
+        //     check_error_code!(PwdPtrMismatch, hash(2, 1 << 12, 1,
+        //                                            Some(b"password"), Some(b"diffsalt"),
+        //                                            Some(&mut out), None,
+        //                                            Variant::ID, Version::Version13));
     }
 }
