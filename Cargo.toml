@@ -13,7 +13,23 @@ keywords = ["argon2", "cryptography", "hash", "password", "security"]
 publish = true
 readme = "README.md"
 categories = ["algorithms", "api-bindings", "authentication", "cryptography"]
-exclude =  [ "phc-winner-argon2/*" ]
+exclude =  [
+	"phc-winner-argon2/kats/*",
+	"phc-winner-argon2/latex/*",
+	"phc-winner-argon2/man/*",
+	"phc-winner-argon2/vs2015/*",
+	"phc-winner-argon2/appveyor.yml",
+	"phc-winner-argon2/argon2-specs.pdf",
+	"phc-winner-argon2/Argon2.sln",
+	"phc-winner-argon2/CHANGELOG.md",
+	"phc-winner-argon2/export.sh",
+	"phc-winner-argon2/libargon2.pc.in",
+	"phc-winner-argon2/LICENSE",
+	"phc-winner-argon2/Makefile",
+	"phc-winner-argon2/README.md",
+	"phc-winner-argon2/tags",
+
+]
 
 [lib]
 name = "argon2"
