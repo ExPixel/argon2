@@ -13,6 +13,7 @@ keywords = ["argon2", "cryptography", "hash", "password", "security"]
 publish = true
 readme = "README.md"
 categories = ["algorithms", "api-bindings", "authentication", "cryptography"]
+exclude =  [ "phc-winner-argon2/*" ]
 
 [lib]
 name = "argon2"
