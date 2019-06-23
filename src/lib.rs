@@ -491,14 +491,14 @@ pub fn verify_ctx<C: TryInto<sys::Argon2_Context, Error = self::Error>>(context:
 }
 
 /// Get the associated error message for a given error code.
-pub fn error_message(code: ErrorCode) -> Option<&'static str> {
+pub fn error_message(code: ErrorCode) -> &'static str {
     unsafe {
         let str_ptr = sys::argon2_error_message(code.to_c());
         if str_ptr.is_null() {
-            None
+            "UNKNOWN_ERROR_CODE"
         } else {
             let str_cstr = CStr::from_ptr(str_ptr);
-            Some(str_cstr.to_str().expect("Variant name is not valid UTF-8"))
+            str_cstr.to_str().expect("Variant name is not valid UTF-8")
         }
     }
 }

@@ -73,7 +73,7 @@ pub enum ErrorCode {
 
 impl ErrorCode {
     /// Get the associated message for this error code.
-    pub fn message(self) -> Option<&'static str> {
+    pub fn message(self) -> &'static str {
         super::error_message(self)
     }
 
