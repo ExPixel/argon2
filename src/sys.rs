@@ -29,10 +29,9 @@ pub struct Argon2_Context {
     pub lanes:      u32,
     pub threads:    u32,
     pub version:    u32,
-    pub flags:      u32,
-
     pub allocate_cbk:   allocate_fptr,
     pub free_cbk:       deallocate_fptr,
+    pub flags:      u32,
 }
 
 pub const Argon2_ErrorCodes_ARGON2_OK: Argon2_ErrorCodes = 0;
