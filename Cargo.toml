@@ -1,12 +1,23 @@
 [package]
 name = "just-argon2"
-version = "0.1.0"
-authors = ["ExPixel <adolphc@outlook.com>"]
+version = "1.0.0"
 edition = "2018"
+
+description = "Bindings to the argon2 C library."
+documentation = "https://docs.rs/just-argon2"
+repository = "https://github.com/ExPixel/argon2"
+homepage = "https://github.com/ExPixel/argon2"
+authors = ["ExPixel <adolphc@outlook.com>"]
+license = "Apache 2.0"
+keywords = ["argon2", "cryptography", "hash", "password", "security"]
+publish = true
+readme = "README.md"
+categories = ["algorithms", "api-bindings", "authentication", "cryptography"]
 
 [lib]
 name = "argon2"
 path = "src/lib.rs"
+crate_type = ["lib"]
 
 [dependencies]
 libc = "0.2"
