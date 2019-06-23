@@ -8,7 +8,7 @@ documentation = "https://docs.rs/just-argon2"
 repository = "https://github.com/ExPixel/argon2"
 homepage = "https://github.com/ExPixel/argon2"
 authors = ["ExPixel <adolphc@outlook.com>"]
-license = "Apache 2.0"
+license = "Apache-2.0"
 keywords = ["argon2", "cryptography", "hash", "password", "security"]
 publish = true
 readme = "README.md"
@@ -28,7 +28,6 @@ exclude =  [
 	"phc-winner-argon2/Makefile",
 	"phc-winner-argon2/README.md",
 	"phc-winner-argon2/tags",
-
 ]
 
 [lib]
