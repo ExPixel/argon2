@@ -49,9 +49,10 @@ steps:
     displayName: Install Rust (Windows)
     condition: eq( variables['Agent.OS'], 'Windows_NT' )
   - script: |
-      %CLANG_DIR%\bin --version
+      %CLANG_DIR%\bin\clang --version
       rustc --version
       cargo --version
+      clang --version
     displayName: Check Tools (Windows)
     condition: eq( variables['Agent.OS'], 'Windows_NT' )
   - script: cargo build --all
@@ -59,3 +60,4 @@ steps:
   - script: cargo test --all
     displayName: Cargo Test
   - script: cargo test -- --ignored
+    displayName: Cargo Test (Expensive)
