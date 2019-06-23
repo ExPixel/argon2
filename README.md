@@ -3,7 +3,7 @@ Argon2 Bindings
 
 [![Build Status](https://dev.azure.com/expixel/Argon2/_apis/build/status/ExPixel.argon2?branchName=master)](https://dev.azure.com/expixel/Argon2/_build/latest?definitionId=1&branchName=master)
 [![crates.io](https://img.shields.io/crates/v/just-argon2.svg?color=orange)](https://crates.io/crates/just-argon2)
-[![docs.rs](https://img.shields.io/badge/docs-stable-blue.svg)](https://docs.rs/just-argon2/1.0.0/argon2/)
+[![docs.rs](https://img.shields.io/badge/docs-stable-blue.svg)](https://docs.rs/just-argon2/1.2.0/argon2/)
 
 Bindings to the Argon2 C library for Rust. The C implementation can be found at [https://github.com/P-H-C/phc-winner-argon2](https://github.com/P-H-C/phc-winner-argon2)
 
