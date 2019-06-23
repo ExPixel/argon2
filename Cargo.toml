@@ -1,6 +1,6 @@
 [package]
 name = "just-argon2"
-version = "1.0.0"
+version = "1.1.0"
 edition = "2018"
 
 description = "Bindings to the argon2 C library."
@@ -36,9 +36,7 @@ path = "src/lib.rs"
 crate_type = ["lib"]
 
 [dependencies]
-libc = "0.2"
 bitflags = "1.1"
 
 [build-dependencies]
 cc = "1.0.37"
-bindgen = "0.49"

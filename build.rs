@@ -1,7 +1,7 @@
 extern crate cc;
-extern crate bindgen;
+// extern crate bindgen;
 
-use std::env;
+// use std::env;
 use std::path::PathBuf;
 
 pub fn main() {
@@ -32,48 +32,48 @@ pub fn main() {
     header_dirs.iter().for_each(|d| { build.include(&d); });
     build.compile("libargon2");
 
-    let bindings = bindgen::Builder::default()
-        .header(
-            argon2_root
-                .join("include")
-                .join("argon2.h")
-                .to_str()
-                .expect("Failed to convert path to string.")
-        )
-        .whitelist_type("Argon2_Context")
-        .whitelist_type("Argon2_type")
-        .whitelist_type("Argon2_version")
-        .whitelist_type("Argon2_ErrorCodes")
-        .whitelist_function("argon2_type2string")
-        .whitelist_function("argon2_ctx")
-        .whitelist_function("argon2i_hash_encoded")
-        .whitelist_function("argon2i_hash_raw")
-        .whitelist_function("argon2d_hash_encoded")
-        .whitelist_function("argon2d_hash_raw")
-        .whitelist_function("argon2id_hash_encoded")
-        .whitelist_function("argon2id_hash_raw")
-        .whitelist_function("argon2_hash")
-        .whitelist_function("argon2i_verify")
-        .whitelist_function("argon2d_verify")
-        .whitelist_function("argon2id_verify")
-        .whitelist_function("argon2_verify")
-        .whitelist_function("argon2d_ctx")
-        .whitelist_function("argon2i_ctx")
-        .whitelist_function("argon2id_ctx")
-        .whitelist_function("argon2d_verify_ctx")
-        .whitelist_function("argon2i_verify_ctx")
-        .whitelist_function("argon2id_verify_ctx")
-        .whitelist_function("argon2_verify_ctx")
-        .whitelist_function("argon2_error_message")
-        .whitelist_function("argon2_encodedlen")
-        .layout_tests(true)
-        .generate()
-        .expect("Failed to generate bindings.");
+    // let bindings = bindgen::Builder::default()
+    //     .header(
+    //         argon2_root
+    //             .join("include")
+    //             .join("argon2.h")
+    //             .to_str()
+    //             .expect("Failed to convert path to string.")
+    //     )
+    //     .whitelist_type("Argon2_Context")
+    //     .whitelist_type("Argon2_type")
+    //     .whitelist_type("Argon2_version")
+    //     .whitelist_type("Argon2_ErrorCodes")
+    //     .whitelist_function("argon2_type2string")
+    //     .whitelist_function("argon2_ctx")
+    //     .whitelist_function("argon2i_hash_encoded")
+    //     .whitelist_function("argon2i_hash_raw")
+    //     .whitelist_function("argon2d_hash_encoded")
+    //     .whitelist_function("argon2d_hash_raw")
+    //     .whitelist_function("argon2id_hash_encoded")
+    //     .whitelist_function("argon2id_hash_raw")
+    //     .whitelist_function("argon2_hash")
+    //     .whitelist_function("argon2i_verify")
+    //     .whitelist_function("argon2d_verify")
+    //     .whitelist_function("argon2id_verify")
+    //     .whitelist_function("argon2_verify")
+    //     .whitelist_function("argon2d_ctx")
+    //     .whitelist_function("argon2i_ctx")
+    //     .whitelist_function("argon2id_ctx")
+    //     .whitelist_function("argon2d_verify_ctx")
+    //     .whitelist_function("argon2i_verify_ctx")
+    //     .whitelist_function("argon2id_verify_ctx")
+    //     .whitelist_function("argon2_verify_ctx")
+    //     .whitelist_function("argon2_error_message")
+    //     .whitelist_function("argon2_encodedlen")
+    //     .layout_tests(true)
+    //     .generate()
+    //     .expect("Failed to generate bindings.");
 
-    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
-    bindings
-        .write_to_file(out_path.join("argon2-bindings.rs"))
-        .expect("Couldn't write bindings.");
+    // let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
+    // bindings
+    //     .write_to_file(out_path.join("argon2-bindings.rs"))
+    //     .expect("Couldn't write bindings.");
 
     source_files.iter()
         .map(|p| p.to_str().expect("Failed to convert path to string."))
