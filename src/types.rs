@@ -461,7 +461,7 @@ pub(crate) fn opt_slice_len<T, S: AsRef<[T]>>(opt: &Option<S>) -> usize {
 /// a u32, returning an error on failure.
 #[inline]
 pub(crate) fn opt_slice_len_u32<T, S: AsRef<[T]>>(param: &'static str, opt: &Option<S>) -> Result<u32, Error> {
-    try_conv(param, opt.as_ref().map(|s| s.as_ref().len()).unwrap_or(0))
+    try_conv(param, opt_slice_len(opt))
 }
 
 /// Converts an option containing a slice into a mutable pointer that is null if the option is

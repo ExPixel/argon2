@@ -38,7 +38,7 @@ fn main() {
     };
     argon2::i_ctx(&mut context).expect("Error hashing using low-level API.");
 
-    assert_eq!(&hash1[0..], &hash2[0..], "Hashes do not match.");
+    assert_eq!(&hash1[..], &hash2[..], "Hashes do not match.");
 
     println!("Hashes match.");
 }
