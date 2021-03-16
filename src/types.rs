@@ -263,17 +263,17 @@ bitflags::bitflags! {
 }
 
 /// Structure to hold Argon2 inputs.
-pub struct Context<'o, 'p, 'sa, 'se, 'ad> {
+pub struct Context<'a> {
     /// Output array.
-    pub out:    &'o mut [u8],
+    pub out:    &'a mut [u8],
     /// Password array.
-    pub pwd:    Option<&'p mut [u8]>,
+    pub pwd:    Option<&'a mut [u8]>,
     /// Salt array.
-    pub salt:   Option<&'sa mut [u8]>,
+    pub salt:   Option<&'a mut [u8]>,
     /// Secret array.
-    pub secret: Option<&'se mut [u8]>,
+    pub secret: Option<&'a mut [u8]>,
     /// Associated data array.
-    pub ad:     Option<&'ad mut [u8]>,
+    pub ad:     Option<&'a mut [u8]>,
 
     /// Number of passes.
     pub t_cost: u32,
@@ -291,7 +291,7 @@ pub struct Context<'o, 'p, 'sa, 'se, 'ad> {
     pub flags: Flags,
 }
 
-impl<'o, 'p, 'sa, 'se, 'ad> Context<'o, 'p, 'sa, 'se, 'ad> {
+impl Context<'_> {
     /// Minimum number of lanes (degree of parallelism).
     pub const MIN_LANES: u32 = 1;
     /// Maximum number of lanes (degree of parallelism).
@@ -389,7 +389,7 @@ pub struct OwnedContext {
 }
 
 impl OwnedContext {
-    pub fn borrowed<'a>(&'a mut self) -> Context<'a, 'a, 'a, 'a, 'a> {
+    pub fn borrowed<'a>(&'a mut self) -> Context<'a> {
         Context {
             out: &mut self.out,
             pwd: self.pwd.as_mut().map(|v| &mut v[0..]),
@@ -429,10 +429,10 @@ impl OwnedContext {
     }
 }
 
-impl<'o, 'p, 'sa, 'se, 'ad> std::convert::TryFrom<&mut Context<'o, 'p, 'sa, 'se, 'ad>> for sys::Argon2_Context {
+_mpl<'a> std::convert::TryFrom<&mut Context<'a>> for sys::Argon2_Context {
     type Error = self::Error;
 
-    fn try_from(context: &mut Context<'o, 'p, 'sa, 'se, 'ad>) -> Result<Self, Self::Error> {
+    fn try_from(context: &mut Context<'a>) -> Result<Self, Self::Error> {
         context.try_to_c()
     }
 }
