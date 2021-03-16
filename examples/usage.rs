@@ -24,7 +24,7 @@ fn main() {
 
     // Low-level API
     let mut context = argon2::Context {
-        out:        &mut hash2,
+        out:        &mut hash2[..],
         pwd:        Some(&mut pwd),
         salt:       Some(&mut salt),
         secret:     None,

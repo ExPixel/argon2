@@ -263,17 +263,17 @@ bitflags::bitflags! {
 }
 
 /// Structure to hold Argon2 inputs.
-pub struct Context<'a> {
+pub struct Context<B: AsMut<[u8]> + AsRef<[u8]>> {
     /// Output array.
-    pub out:    &'a mut [u8],
+    pub out:    B,
     /// Password array.
-    pub pwd:    Option<&'a mut [u8]>,
+    pub pwd:    Option<B>,
     /// Salt array.
-    pub salt:   Option<&'a mut [u8]>,
+    pub salt:   Option<B>,
     /// Secret array.
-    pub secret: Option<&'a mut [u8]>,
+    pub secret: Option<B>,
     /// Associated data array.
-    pub ad:     Option<&'a mut [u8]>,
+    pub ad:     Option<B>,
 
     /// Number of passes.
     pub t_cost: u32,
@@ -291,7 +291,7 @@ pub struct Context<'a> {
     pub flags: Flags,
 }
 
-impl Context<'_> {
+impl<B: AsMut<[u8]> + AsRef<[u8]>> Context<B> {
     /// Minimum number of lanes (degree of parallelism).
     pub const MIN_LANES: u32 = 1;
     /// Maximum number of lanes (degree of parallelism).
@@ -336,9 +336,10 @@ impl Context<'_> {
     pub const MAX_SECRET_LENGTH: u32 = 0xFFFFFFFF;
 
     pub(crate) fn try_to_c(&mut self) -> Result<sys::Argon2_Context, Error> {
+        let out = self.out.as_mut();
         Ok(sys::Argon2_Context {
-            out: self.out.as_mut_ptr(),
-            outlen: try_conv("context.out.len", self.out.len())?,
+            out: out.as_mut_ptr(),
+            outlen: try_conv("context.out.len", out.len())?,
             pwd: opt_slice_ptr_mut(&mut self.pwd),
             pwdlen: opt_slice_len_u32("context.pwd.len", &self.pwd)?,
             salt: opt_slice_ptr_mut(&mut self.salt),
@@ -359,88 +360,10 @@ impl Context<'_> {
     }
 }
 
-/// Structure to hold Argon2 inputs. Unlike `Context`, this version owns all of the input values.
-pub struct OwnedContext {
-    /// Output array.
-    pub out:    Vec<u8>,
-    /// Password array.
-    pub pwd:    Option<Vec<u8>>,
-    /// Salt array.
-    pub salt:   Option<Vec<u8>>,
-    /// Secret array.
-    pub secret: Option<Vec<u8>>,
-    /// Associated data array.
-    pub ad:     Option<Vec<u8>>,
-
-    /// Number of passes.
-    pub t_cost: u32,
-    /// Amount of memory requested (KB)
-    pub m_cost: u32,
-    /// Number of lanes.
-    pub lanes:  u32,
-    /// Maximum number of threads.
-    pub threads:u32,
-
-    /// Version number.
-    pub version: Version,
-
-    /// Array of bool options
-    pub flags: Flags,
-}
-
-impl OwnedContext {
-    pub fn borrowed<'a>(&'a mut self) -> Context<'a> {
-        Context {
-            out: &mut self.out,
-            pwd: self.pwd.as_mut().map(|v| &mut v[0..]),
-            salt: self.salt.as_mut().map(|v| &mut v[0..]),
-            secret: self.secret.as_mut().map(|v| &mut v[0..]),
-            ad: self.ad.as_mut().map(|v| &mut v[0..]),
-            t_cost: self.t_cost,
-            m_cost: self.m_cost,
-            lanes: self.lanes,
-            threads: self.threads,
-            version: self.version,
-            flags: self.flags.clone(),
-        }
-    }
-
-    pub(crate) fn try_to_c(&mut self) -> Result<sys::Argon2_Context, Error> {
-        Ok(sys::Argon2_Context {
-            out: self.out.as_mut_ptr(),
-            outlen: try_conv("context.out.len", self.out.len())?,
-            pwd: opt_slice_ptr_mut(&mut self.pwd),
-            pwdlen: opt_slice_len_u32("context.pwd.len", &self.pwd)?,
-            salt: opt_slice_ptr_mut(&mut self.salt),
-            saltlen: opt_slice_len_u32("context.salt.len", &self.salt)?,
-            secret: opt_slice_ptr_mut(&mut self.secret),
-            secretlen: opt_slice_len_u32("context.secret.len", &self.secret)?,
-            ad: opt_slice_ptr_mut(&mut self.ad),
-            adlen: opt_slice_len_u32("context.ad.len", &self.ad)?,
-            t_cost: self.t_cost,
-            m_cost: self.m_cost,
-            lanes: self.lanes,
-            threads: self.threads,
-            version: self.version.to_c() as _,
-            allocate_cbk: None,
-            free_cbk: None,
-            flags: self.flags.bits(),
-        })
-    }
-}
-
-_mpl<'a> std::convert::TryFrom<&mut Context<'a>> for sys::Argon2_Context {
+impl<B: AsMut<[u8]> + AsRef<[u8]>> std::convert::TryFrom<&mut Context<B>> for sys::Argon2_Context {
     type Error = self::Error;
 
-    fn try_from(context: &mut Context<'a>) -> Result<Self, Self::Error> {
-        context.try_to_c()
-    }
-}
-
-impl std::convert::TryFrom<&mut OwnedContext> for sys::Argon2_Context {
-    type Error = self::Error;
-
-    fn try_from(context: &mut OwnedContext) -> Result<Self, Self::Error> {
+    fn try_from(context: &mut Context<B>) -> Result<Self, Self::Error> {
         context.try_to_c()
     }
 }
