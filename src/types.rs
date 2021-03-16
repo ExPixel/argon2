@@ -30,6 +30,18 @@ impl Error {
     }
 }
 
+impl std::fmt::Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::BadParam(msg) => write!(f, "Bad Parameter `{}`", msg),
+            Self::Code(code) => write!(f, "{}", crate::error_message(*code)),
+            Self::Unknown => write!(f, "Received an unknown error code"),
+        }
+    }
+}
+
+impl std::error::Error for Error {}
+
 /// Error code returned by failed Argon2 C functions.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(i32)]
