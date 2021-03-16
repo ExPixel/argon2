@@ -27,7 +27,7 @@ pub fn type2string(variant: Variant, uppercase: bool) -> &'static str {
 }
 
 /// Function that performs memory-hard hashing with certain degree of parallelism.
-pub fn ctx<C: TryInto<sys::Argon2_Context, Error = self::Error>>(context: C, variant: Variant) -> Result<(), Error> {
+pub fn ctx<'a, C: TryInto<sys::Argon2_Context<'a>, Error = self::Error>>(context: C, variant: Variant) -> Result<(), Error> {
     unsafe {
         Error::check_code(sys::argon2_ctx(&mut context.try_into()?, variant.to_c()) as _)
     }
@@ -35,7 +35,7 @@ pub fn ctx<C: TryInto<sys::Argon2_Context, Error = self::Error>>(context: C, var
 
 /// Argon2d: Version of Argon2 that picks memory blocks depending on the password and salt. Only
 /// for side-channel-free environment!!
-pub fn d_ctx<C: TryInto<sys::Argon2_Context, Error = self::Error>>(context: C) -> Result<(), Error> {
+pub fn d_ctx<'a, C: TryInto<sys::Argon2_Context<'a>, Error = self::Error>>(context: C) -> Result<(), Error> {
     unsafe {
         Error::check_code(sys::argon2d_ctx(&mut context.try_into()?))
     }
@@ -44,7 +44,7 @@ pub fn d_ctx<C: TryInto<sys::Argon2_Context, Error = self::Error>>(context: C) -
 /// Argon2i: Version of Argon2 that picks memory blocks
 /// independent on the password and salt. Good for side-channels,
 /// but worse with respect to tradeoff attacks if only one pass is used.
-pub fn i_ctx<C: TryInto<sys::Argon2_Context, Error = self::Error>>(context: C) -> Result<(), Error> {
+pub fn i_ctx<'a, C: TryInto<sys::Argon2_Context<'a>, Error = self::Error>>(context: C) -> Result<(), Error> {
     unsafe {
         Error::check_code(sys::argon2i_ctx(&mut context.try_into()?))
     }
@@ -54,7 +54,7 @@ pub fn i_ctx<C: TryInto<sys::Argon2_Context, Error = self::Error>>(context: C) -
 /// password-independent, the rest are password-dependent (on the password and
 /// salt). OK against side channels (they reduce to 1/2-pass Argon2i), and
 /// better with respect to tradeoff attacks (similar to Argon2d).
-pub fn id_ctx<C: TryInto<sys::Argon2_Context, Error = self::Error>>(context: C) -> Result<(), Error> {
+pub fn id_ctx<'a, C: TryInto<sys::Argon2_Context<'a>, Error = self::Error>>(context: C) -> Result<(), Error> {
     unsafe {
         Error::check_code(sys::argon2id_ctx(&mut context.try_into()?))
     }
@@ -400,7 +400,7 @@ pub fn verify(encoded: &CStr, pwd: Option<&[u8]>, variant: Variant) -> Result<()
 /// - `context`: The current Argon2 context.
 /// - `hash`: The password hash to verify. The length of the hash must match the length of the out
 /// parameter in context.
-pub fn d_verify_ctx<C: TryInto<sys::Argon2_Context, Error = self::Error>>(context: C, hash: &[u8]) -> Result<(), Error> {
+pub fn d_verify_ctx<'a, C: TryInto<sys::Argon2_Context<'a>, Error = self::Error>>(context: C, hash: &[u8]) -> Result<(), Error> {
 
     let mut argon_context = context.try_into()?;
     if hash.len() as u32 != argon_context.outlen {
@@ -424,7 +424,7 @@ pub fn d_verify_ctx<C: TryInto<sys::Argon2_Context, Error = self::Error>>(contex
 /// - `context`: The current Argon2 context.
 /// - `hash`: The password hash to verify. The length of the hash must match the length of the out
 /// parameter in context.
-pub fn i_verify_ctx<C: TryInto<sys::Argon2_Context, Error = self::Error>>(context: C, hash: &[u8]) -> Result<(), Error> {
+pub fn i_verify_ctx<'a, C: TryInto<sys::Argon2_Context<'a>, Error = self::Error>>(context: C, hash: &[u8]) -> Result<(), Error> {
 
     let mut argon_context = context.try_into()?;
     if hash.len() as u32 != argon_context.outlen {
@@ -448,7 +448,7 @@ pub fn i_verify_ctx<C: TryInto<sys::Argon2_Context, Error = self::Error>>(contex
 /// - `context`: The current Argon2 context.
 /// - `hash`: The password hash to verify. The length of the hash must match the length of the out
 /// parameter in context.
-pub fn id_verify_ctx<C: TryInto<sys::Argon2_Context, Error = self::Error>>(context: C, hash: &[u8]) -> Result<(), Error> {
+pub fn id_verify_ctx<'a, C: TryInto<sys::Argon2_Context<'a>, Error = self::Error>>(context: C, hash: &[u8]) -> Result<(), Error> {
 
     let mut argon_context = context.try_into()?;
     if hash.len() as u32 != argon_context.outlen {
@@ -472,7 +472,7 @@ pub fn id_verify_ctx<C: TryInto<sys::Argon2_Context, Error = self::Error>>(conte
 /// - `context`: The current Argon2 context.
 /// - `hash`: The password hash to verify. The length of the hash must match the length of the out
 /// parameter in context.
-pub fn verify_ctx<C: TryInto<sys::Argon2_Context, Error = self::Error>>(context: C, hash: &[u8], variant: Variant) -> Result<(), Error> {
+pub fn verify_ctx<'a, C: TryInto<sys::Argon2_Context<'a>, Error = self::Error>>(context: C, hash: &[u8], variant: Variant) -> Result<(), Error> {
 
     let mut argon_context = context.try_into()?;
     if hash.len() as u32 != argon_context.outlen {

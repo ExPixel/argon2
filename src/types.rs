@@ -291,7 +291,7 @@ pub struct Context<B: AsMut<[u8]> + AsRef<[u8]>> {
     pub flags: Flags,
 }
 
-impl<B: AsMut<[u8]> + AsRef<[u8]>> Context<B> {
+impl<'b, B: 'b + AsMut<[u8]> + AsRef<[u8]>> Context<B> {
     /// Minimum number of lanes (degree of parallelism).
     pub const MIN_LANES: u32 = 1;
     /// Maximum number of lanes (degree of parallelism).
@@ -335,7 +335,7 @@ impl<B: AsMut<[u8]> + AsRef<[u8]>> Context<B> {
     /// Maximum key length in bytes.
     pub const MAX_SECRET_LENGTH: u32 = 0xFFFFFFFF;
 
-    pub(crate) fn try_to_c(&mut self) -> Result<sys::Argon2_Context, Error> {
+    pub fn try_to_c(&mut self) -> Result<sys::Argon2_Context<'b>, Error> {
         let out = self.out.as_mut();
         Ok(sys::Argon2_Context {
             out: out.as_mut_ptr(),
@@ -356,14 +356,15 @@ impl<B: AsMut<[u8]> + AsRef<[u8]>> Context<B> {
             allocate_cbk: None,
             free_cbk: None,
             flags: self.flags.bits(),
+            phantom: std::marker::PhantomData,
         })
     }
 }
 
-impl<B: AsMut<[u8]> + AsRef<[u8]>> std::convert::TryFrom<&mut Context<B>> for sys::Argon2_Context {
+impl<'a, B: AsMut<[u8]> + AsRef<[u8]>> std::convert::TryFrom<&'a mut Context<B>> for sys::Argon2_Context<'a> {
     type Error = self::Error;
 
-    fn try_from(context: &mut Context<B>) -> Result<Self, Self::Error> {
+    fn try_from(context: &'a mut Context<B>) -> Result<Self, Self::Error> {
         context.try_to_c()
     }
 }
