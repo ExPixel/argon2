@@ -2,7 +2,7 @@ use std::os::raw::c_int;
 use std::os::raw::c_void;
 use std::os::raw::c_char;
 
-pub type argon2_context = Argon2_Context;
+pub type argon2_context<'a> = Argon2_Context<'a>;
 pub type argon2_type = Argon2_type;
 
 pub type allocate_fptr = Option<unsafe extern "C" fn(memory: *mut *mut u8, bytes_to_allocate: usize) -> c_int>;
@@ -13,7 +13,7 @@ pub type Argon2_type        = c_int;
 pub type Argon2_version     = c_int;
 
 #[repr(C)]
-pub struct Argon2_Context {
+pub struct Argon2_Context<'a> {
     pub out:        *mut u8,
     pub outlen:     u32,
     pub pwd:        *mut u8,
@@ -32,6 +32,7 @@ pub struct Argon2_Context {
     pub allocate_cbk:   allocate_fptr,
     pub free_cbk:       deallocate_fptr,
     pub flags:      u32,
+    pub phantom:    std::marker::PhantomData<&'a ()>,
 }
 
 pub const Argon2_ErrorCodes_ARGON2_OK: Argon2_ErrorCodes = 0;
